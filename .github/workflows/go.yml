@@ -10,15 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      contents: read
+      attestations: write
+      id-token: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
 
       - name: Docker login
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        uses: docker/login-action@v1
         with:
+          registry: ghcr.io
           username: mrido10
-          registry: https://ghcr.io
           password: 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
       
       - name: Build and push
