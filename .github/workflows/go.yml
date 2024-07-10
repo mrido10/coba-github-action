@@ -4,6 +4,9 @@ on:
   push:
     branches: 
       - stage 
+env:
+  DOCKER_REGISTRY: ghcr.io
+  GH_REPO_NAME: coba-github-action
 jobs:
   build: 
     name: Build and deploy
@@ -20,15 +23,15 @@ jobs:
       - name: Docker login
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
-          registry: ghcr.io
-          username: mrido10
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: mrido10/coba-github-action
+          images: ${{ github.repository_owner }}/${{ env.GH_REPO_NAME }}
       
       - name: Build and push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
@@ -36,6 +39,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          tags: latest
 
       - name: Remote to vps and deploy
         uses: appleboy/ssh-action@v1.0.3
@@ -46,5 +50,5 @@ jobs:
           port: 22
           script: |
             cd docker_compose_files 
-            sudo docker login -u mrido10 -p ${{ secrets.GH_TOKEN }}
+            sudo docker login -u ${{ github.repository_owner }} -p ${{ secrets.GH_TOKEN }}
             sudo docker pull ghcr.io/mrido10/coba-test
