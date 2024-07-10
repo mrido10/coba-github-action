@@ -21,6 +21,7 @@ jobs:
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
           username: mrido10
+          registry: https://ghcr.io
           password: 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
       
       - name: Build and push
