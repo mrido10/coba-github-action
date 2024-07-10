@@ -6,7 +6,7 @@ on:
       - stage 
 jobs:
   build: 
-    name: Build images
+    name: Build and deploy
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -23,6 +23,12 @@ jobs:
           registry: ghcr.io
           username: mrido10
           password: ${{ secrets.GH_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: mrido10/coba-github-action
       
       - name: Build and push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
@@ -31,17 +37,14 @@ jobs:
           file: ./Dockerfile
           push: true
 
-  deploy:
-    name: Deploy to vps
-    runs-on: ubuntu-latest
-    steps:
-    - name: remote to ssh
-      uses: appleboy/ssh-action@v1.0.3
-      with: 
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: 22
-        script: |
-          cd docker_compose_files
-          sudo docker pull ghcr.io/mrido10/coba-test
+      - name: Remote to vps and deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with: 
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd docker_compose_files 
+            sudo docker login -u mrido10 -p ${{ secrets.GH_TOKEN }}
+            sudo docker pull ghcr.io/mrido10/coba-test
