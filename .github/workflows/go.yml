@@ -22,7 +22,7 @@ jobs:
         with:
           registry: ghcr.io
           username: mrido10
-          password: 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
+          password: ${{ secrets.GH_TOKEN }}
       
       - name: Build and push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
