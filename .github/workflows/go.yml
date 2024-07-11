@@ -22,11 +22,17 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Docker build and push
+      - name: Docker login
         run: |
           echo "${{ secrets.GH_TOKEN }}" | docker login ${{ env.DOCKER_REGISTRY }} -u ${{ github.repository_owner }} --password-stdin
+
+      - name: Docker build
+        run: |
           docker build -t ${{ env.DOCKER_IMAGE_NAME }} .
           docker tag ${{ env.DOCKER_IMAGE_NAME }} ${{ env.DOCKER_IMAGE_NAME_FULL }}
+      
+      - name: Docker push
+        run: |
           docker push ${{ env.DOCKER_IMAGE_NAME_FULL }}
 
       - name: Remote to vps and deploy
